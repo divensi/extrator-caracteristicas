@@ -10,8 +10,10 @@ from matplotlib import pyplot as plt
 from scipy import stats
 
 from algoritmos.haralick import haralick
+
 from algoritmos.fractal import fractal_dimension
 from algoritmos.fractal import fractal_lacunaridade
+from algoritmos.fractal import calcsucolaridade
 
 from algoritmos.estruturais import area
 from algoritmos.estruturais import perimetro
@@ -20,6 +22,7 @@ from algoritmos.estatisticos import desvio_padrao
 from algoritmos.estatisticos import curtose
 from algoritmos.estatisticos import mediana
 from algoritmos.estatisticos import variancia
+
 
 def main():
   directory = "/Users/divensi/Dataset/MAIUSCULAS"
@@ -48,6 +51,10 @@ def main():
     'variância',
     'lacunaridade',
     'dimensao fractal',
+    'sucolaridade de cima para baixo',
+    'sucolaridade da direita para a esquerda',
+    'sucolaridade de baixo para cima',
+    'sucolaridade da esquerda para a direita',
   ]
 
   dataset = []
@@ -69,8 +76,14 @@ def main():
     descritores.append(variancia(image)) # variancia
 
     descritores.append(fractal_lacunaridade(10, image))
-
     descritores.append(fractal_dimension(image))
+
+    sucolaridades = calcsucolaridade(image)
+
+    descritores.append(sucolaridades[0])
+    descritores.append(sucolaridades[1])
+    descritores.append(sucolaridades[2])
+    descritores.append(sucolaridades[3])
 
     # # cv2.imshow("Imagem", image)
     # lbp = feature.local_binary_pattern(image, 8, 2)

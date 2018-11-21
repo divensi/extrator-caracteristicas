@@ -105,3 +105,88 @@ def fractal_lacunaridade(theta, image):
   # print("lacunalirade terminada com resultado: {}".format(result))
   
   return result
+
+def calcsucolaridade(imagemOg):
+  '''
+  recebe uma imagem binaria e retorna os 4 valores:
+  1 - sucolaridade de cima para baixo;
+  2 - sucolaridade da direita para a esquerda;
+  3 - sucolaridade de baixo para cima;
+  4 - sucolaridade da esquerda para a direita;
+  '''
+
+  image = cv2.cvtColor(imagemOg, cv2.COLOR_GRAY2BGR)# convert to 24 bits 
+
+  # copia imagens
+  # cima para baixo
+  i1 = image.copy()
+  # direita para esquerda
+  i2 = np.rot90(i1.copy())
+  # baixo para cima
+  i3 = np.rot90(i2.copy())
+  # esquerda para direita
+  i4 = np.rot90(i3.copy())
+
+  imagens = [i1, i2, i3, i4]
+
+  rows = image.shape[0]-1
+  vermelho = [255, 0, 0]
+  fator = [255, 255, 255]
+
+  pressoes = []
+
+  for imagem in imagens:
+    # plt.imshow(imagem)
+    # plt.show()
+
+    for col in range(imagem.shape[1]):
+
+
+      ## verifica se os dois sets sao iguais
+      if set(imagem[0][col]) == set(fator):
+        # por algum motivo, se nao for feita uma copia da uma execao
+        imagem = imagem.copy()
+        cv2.floodFill(imagem, None, (col, 0), vermelho)
+
+    # substitui a cor branca por cor preta (deixando apenas o flood fill)
+    imagem[np.where((imagem==[255, 255, 255]).all(axis=2))] = [0, 0, 0]
+
+    pressoes.append(calcular_pressao(imagem))
+
+  return pressoes
+
+def calcular_pressao(image, pressao=3):
+  """ Calcula a pressão da imagem
+  """
+  roi = [int(image.shape[0]/pressao), int(image.shape[1]/pressao)]
+  resolucao_roi = roi[0] * roi[1]
+  delta_ponto_central = roi[0]/2
+
+  ocupacao_total = 0
+  ocupacao_maxima = 0
+
+  #basicamente dividir a imagem em quadros 3X3 ai calcular a ocupacao deles e divida-la peal ocupacao maxima 
+  #soma a porcentagem de ocupacao do quadrante 3*3 ex: for do roi da imagem é ir em cada caixinha dois for linha e coluna
+  for linroi in range(roi[0]):
+    for colroi in range(roi[1]):
+      ocupacao = 0
+
+      #calcula ocupacao do roi
+      for lin in range(linroi * pressao, (linroi + 1) * pressao):
+        for col in range(colroi * pressao, (colroi + 1) * pressao):
+          if set(image[lin][col]) == set([255, 0, 0]):
+            #acumula ocupacao do roi
+            ocupacao += 1
+      # rows numero de colunas
+      pontocentral = (linroi * roi[0]) + delta_ponto_central
+
+      porc_ocupacao = ocupacao/resolucao_roi
+
+      #ocupacao total+=ocupacao do roi*pontocentral 
+      ocupacao_total += (porc_ocupacao * pontocentral)
+      ocupacao_maxima += 1 * pontocentral
+ 
+  resultado = ocupacao_total/ocupacao_maxima
+
+  return resultado
+
