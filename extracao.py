@@ -55,13 +55,17 @@ def main():
     'sucolaridade da direita para a esquerda',
     'sucolaridade de baixo para cima',
     'sucolaridade da esquerda para a direita',
+    'desvio padrão histograma',
+    'mediana histograma',
+    'curtose histograma',
+    'variancia histograma',
   ]
 
   dataset = []
 
   dataset.append(header)
 
-  for file in glob.glob("{}/A*.pgm".format(directory)):
+  for file in glob.glob("{}/A0000*.pgm".format(directory)):
     image = cv2.imread(file, -1)
     descritores = list(haralick(image))
 
@@ -86,16 +90,23 @@ def main():
     descritores.append(sucolaridades[3])
 
     # # cv2.imshow("Imagem", image)
-    # lbp = feature.local_binary_pattern(image, 8, 2)
-    # # cv2.imshow("LBP", lbp)
-    # descritores.append(lbp)
+    lbp = feature.local_binary_pattern(image, 8, 2)
 
+
+    # cv2.imshow("LBP", lbp)
+    # cv2.waitKey()
+    # descritores.append(lbp)
+    # hist = cv2.calcHist(lbp,[0],None,[256],[0,256])
+    # histograma_lbp = lbp.ravel()
+    histograma, bins = np.histogram(lbp.ravel(),256,[0,256])
+
+    descritores.append(desvio_padrao(histograma)) # desvio padrão histograma
+    descritores.append(mediana(histograma)) # mediana histograma
+    descritores.append(curtose(histograma)) # curtose histograma
+    descritores.append(variancia(histograma)) # variancia histograma
 
     # # print(descritores)
     dataset.append(descritores)
-
-    # ## calcular histograma sobre o lbp.ravel()
-    # # cv2.waitKey()
 
   np.savetxt('dataset.csv', dataset,delimiter=",", fmt='%s')
 
