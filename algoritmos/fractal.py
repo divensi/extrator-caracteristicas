@@ -7,8 +7,7 @@ from skimage import feature
 from matplotlib import pyplot as plt
 
 
-def fractal_dimension(Z, threshold=0.9):
-
+def fractal_dimension(Z, threshold=128):
   # Only for 2d image
   assert(len(Z.shape) == 2)
 
@@ -20,7 +19,6 @@ def fractal_dimension(Z, threshold=0.9):
 
     # We count non-empty (0) and non-full boxes (k*k)
     return len(np.where((S > 0) & (S < k*k))[0])
-
 
   # Transform Z into a binary array
   Z = (Z < threshold)
@@ -106,7 +104,7 @@ def fractal_lacunaridade(theta, image):
   
   return result
 
-def calcsucolaridade(imagemOg):
+def calcsucolaridade(imagemOg, threshold=128):
   '''
   recebe uma imagem binaria e retorna os 4 valores:
   1 - sucolaridade de cima para baixo;
@@ -114,8 +112,15 @@ def calcsucolaridade(imagemOg):
   3 - sucolaridade de baixo para cima;
   4 - sucolaridade da esquerda para a direita;
   '''
-
-  image = cv2.cvtColor(imagemOg, cv2.COLOR_GRAY2BGR)# convert to 24 bits 
+  image = None
+  if (imagemOg.shape == (64, 64) or imagemOg.shape == (64, 64, 1)):
+    image = cv2.cvtColor(imagemOg, cv2.COLOR_GRAY2BGR)# convert to 24 bits 
+  else:
+    image = imagemOg # convert to 24 bits 
+  
+  # Transform image into a binary array
+  # image = (image > threshold) * 255
+  _, image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
 
   # copia imagens
   # cima para baixo

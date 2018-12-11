@@ -65,7 +65,7 @@ def main():
 
   dataset.append(header)
 
-  for file in glob.glob("{}/A0000*.pgm".format(directory)):
+  for file in glob.glob("{}/*.pgm".format(directory)):
     image = cv2.imread(file, -1)
     descritores = list(haralick(image))
 
