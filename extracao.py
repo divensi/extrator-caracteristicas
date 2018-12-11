@@ -98,8 +98,10 @@ def main():
     # descritores.append(lbp)
     # hist = cv2.calcHist(lbp,[0],None,[256],[0,256])
     # histograma_lbp = lbp.ravel()
-    histograma, bins = np.histogram(lbp.ravel(),256,[0,256])
+    histograma, bins = np.histogram(lbp.ravel(), bins=np.range(0, 60), range=(0, 59))
 
+    descritores.append(histograma)
+   
     descritores.append(desvio_padrao(histograma)) # desvio padrão histograma
     descritores.append(mediana(histograma)) # mediana histograma
     descritores.append(curtose(histograma)) # curtose histograma
